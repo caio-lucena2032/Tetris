@@ -15,6 +15,7 @@ public:
     std::vector<int> isRowCompleted();
     void clearRow(int rowCompleted);
     void moveRowsDown(int rowCompleted);
+    int getDifferentTypeInRow(int row);
 
     int grid[20][10];
 

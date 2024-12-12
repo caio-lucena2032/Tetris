@@ -40,7 +40,7 @@ void Grid::draw()
         for (int col = 0; col<this->numCols;col++)
         {
             int cellValue = this->grid[row][col];
-            DrawRectangle(col * this->cellSize+1, row * this->cellSize+1, this->cellSize-1, this->cellSize-1, this->colors[cellValue]);
+            DrawRectangle(col * this->cellSize+11, row * this->cellSize+11, this->cellSize-1, this->cellSize-1, this->colors[cellValue]);
         }
     }
 }
@@ -107,4 +107,27 @@ void Grid::moveRowsDown(int rowCompleted)
         if (isUpperRowEmpty)
             return;
     }
+}
+
+int Grid::getDifferentTypeInRow(int row)
+{
+    std::vector<int> differentTypes;
+    bool isNumberInRow = false;
+
+    for (int col=0; col < this->numCols; col++)
+    {
+        for (int item: differentTypes)
+        {
+            if (grid[row][col] == item)
+            {
+                isNumberInRow = true;
+                break;
+            }
+        }
+
+        if (isNumberInRow)
+            differentTypes.push_back(grid[row][col]);
+    }
+
+    return (int)differentTypes.size();
 }

@@ -19,7 +19,12 @@ public:
     void moveAllDown();
     void updatePontuation();
     void resetGame();
+    void shouldIncreaseLevel();
     Grid grid;
+    int playerPontuation;
+    int level;
+    double gameSpeed;
+    bool IsGameOver;
 
 private:
     bool isBlockOutside();
@@ -30,6 +35,4 @@ private:
     std::vector<Block> blocks;
     Block currentBlock;
     Block nextBlock;
-    bool IsGameOver;
-
 };

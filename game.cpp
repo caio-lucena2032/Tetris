@@ -9,6 +9,9 @@ game::game()
     this->currentBlock = getRandomBlock();
     this->nextBlock = getRandomBlock();
     this->IsGameOver = false;
+    this->playerPontuation = 0;
+    this->level = 1;
+    this->gameSpeed = 0.5;
 }
 
 Block game::getRandomBlock()
@@ -38,36 +41,33 @@ void game::handleInput()
 {
     int keyPressed = GetKeyPressed();
 
-    std::cout << "Key pressed ---> " << keyPressed << std::endl;
-    std::cout << "is Game over ---> " << this->IsGameOver << std::endl;
-
     if (this->IsGameOver && keyPressed == KEY_ENTER)
     {
         this->IsGameOver = false;
         this->resetGame();
     }
-        switch(keyPressed)
-        {
-            case KEY_LEFT:
-                this->moveLeft();
-                break;
 
-            case KEY_RIGHT:
-                this->moveRight();
-                break;
+    switch(keyPressed)
+    {
+        case KEY_LEFT:
+            this->moveLeft();
+            break;
 
-            case KEY_DOWN:
-                this->moveDown();
-                break;
+        case KEY_RIGHT:
+            this->moveRight();
+            break;
 
-            case KEY_UP:
-                this->rotateBlock();
-                break;
+        case KEY_DOWN:
+            this->moveDown();
+            break;
 
-            case KEY_SPACE:
-                this->moveAllDown();
-                break;
+        case KEY_UP:
+            this->rotateBlock();
+            break;
 
+        case KEY_SPACE:
+            this->moveAllDown();
+            break;
     }
 }
 
@@ -164,6 +164,7 @@ void game::unableBlock()
     
     this->currentBlock = this->nextBlock;
     this->nextBlock = this->getRandomBlock();
+    this->playerPontuation +=50;
 }
 
 bool game::blockFits(Block block)
@@ -183,14 +184,19 @@ bool game::blockFits(Block block)
 void game::updatePontuation()
 {
     std::vector<int> rowsCompleted = grid.isRowCompleted();
+    int differentTypes;
 
     if (!rowsCompleted.empty())
     {
         for(int item: rowsCompleted)
         {
+            differentTypes  = grid.getDifferentTypeInRow(item);
             grid.clearRow(item);
             grid.moveRowsDown(item);
         }
+
+        this->playerPontuation += (300 * (std::size(rowsCompleted)) + 100) * this->level;
+        this->playerPontuation += 50 * differentTypes;
     }
 }
 
@@ -200,4 +206,38 @@ void game::resetGame()
     this->blocks = this->getAllBlocks();
     this->currentBlock = this->getRandomBlock();
     this->nextBlock = this->getRandomBlock();
+    this->playerPontuation = 0;
+    this->level = 1;
+}
+
+void game::shouldIncreaseLevel()
+{
+    int levelPontuation;
+
+    /*
+        Under level 5, the pontuation starts in 10000 points 
+        and in each level it's increased 2500 points
+    */
+    if (this->level < 5)
+    {
+        levelPontuation = 2000 * this->level + 1000;
+    }
+    else if (this->level < 10)
+    {
+        levelPontuation = 4000 * this->level + 9000;
+    }
+    else if (this->level < 15)
+    {
+        levelPontuation = 5000 * this->level + 45000;
+    }
+    else
+    {
+        levelPontuation = 5000 * this->level + 163000;
+    }
+
+    if (this->playerPontuation >= levelPontuation)
+    {
+        this->level += 1;
+        this->gameSpeed -= 0.01;
+    }
 }
