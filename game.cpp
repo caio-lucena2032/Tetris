@@ -34,7 +34,22 @@ std::vector<Block> game::getAllBlocks()
 void game::draw()
 {
     grid.draw();
-    currentBlock.draw();
+    currentBlock.draw(11, 11);
+
+    switch (this->nextBlock.id)
+    {
+    case 3:
+        this->nextBlock.draw(255, 315);
+        break;
+    
+    case 4:
+        this->nextBlock.draw(255, 290);
+        break;
+
+    default:
+        this->nextBlock.draw(270, 290);
+        break;
+    }
 }
 
 void game::handleInput()
