@@ -58,7 +58,6 @@ void game::handleInput()
 
     if (this->IsGameOver && keyPressed == KEY_ENTER)
     {
-        this->IsGameOver = false;
         this->resetGame();
     }
 
@@ -223,6 +222,7 @@ void game::resetGame()
     this->nextBlock = this->getRandomBlock();
     this->playerPontuation = 0;
     this->level = 1;
+    this->IsGameOver = false;
 }
 
 void game::shouldIncreaseLevel()

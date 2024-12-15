@@ -1,11 +1,14 @@
 #include "raylib.h"
 #include "game.hpp"
+#include "menu.hpp"
 
 #define WIDTH 500
 #define HEIGHT 620
 #define FPS 60
 
 double lastTimeLoweredBlock = 0;
+bool shouldReturnToGame = false;
+bool isInMenu = true;
 
 bool shoulLowerTheBlock(double interval)
 {
@@ -18,7 +21,7 @@ bool shoulLowerTheBlock(double interval)
     return false;
 }
 
-void interfaceDraw(game tetris, Font font)
+void drawGame(game tetris, Font font)
 {
     char scoreText[10];
     sprintf(scoreText, "%d", tetris.playerPontuation);
@@ -44,31 +47,64 @@ int main()
     SetTargetFPS(FPS);
     Font font = GetFontDefault();
     game tetris = game();
+    Menu menu = Menu(font);
 
     while(!WindowShouldClose())
     {
-        /*
-            Moviment of the player and the blocl
-        */
-        tetris.handleInput();
-        if (shoulLowerTheBlock(tetris.gameSpeed))
-        {
-            tetris.moveDown();
-        }
-        
-        /*
-            Scores of the game
-        */
-        tetris.updatePontuation();
-        tetris.shouldIncreaseLevel();
-        
         /*
             Drawing functions
         */
         BeginDrawing();
         ClearBackground(GOLD);
-        interfaceDraw(tetris, font);
-        tetris.draw();
+
+        if ((!tetris.IsGameOver || shouldReturnToGame) && !isInMenu)
+        {
+            /*
+                Scores of the game
+            */
+            tetris.updatePontuation();
+            tetris.shouldIncreaseLevel();
+
+
+            /*
+                Moviment of the player and the block
+            */
+            tetris.handleInput();
+            if (shoulLowerTheBlock(tetris.gameSpeed))
+            {
+                tetris.moveDown();
+            }
+            
+            drawGame(tetris, font);
+            tetris.draw();
+
+            if (shouldReturnToGame)
+            {
+                tetris.resetGame();
+                shouldReturnToGame = false;
+                isInMenu = false;
+            }
+        }
+        
+        else
+        {
+            if (GetKeyPressed() == KEY_ENTER || isInMenu)
+            {
+                isInMenu = true;
+                menu.draw();
+                
+                /*
+                    Defines when should go back to play the game
+                */
+                // shouldReturnToGame = true;
+            }
+            else
+            {
+                drawGame(tetris, font);
+                tetris.draw();
+            }
+        }
+
         EndDrawing();
     }
 

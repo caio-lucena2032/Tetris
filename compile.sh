@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Arquivos fonte
-SOURCE="main.cpp grid.cpp position.cpp Block.cpp colors.cpp game.cpp"
+SOURCE="main.cpp grid.cpp position.cpp Block.cpp colors.cpp game.cpp menu.cpp"
 
 # Nome do executável
 OUTPUT="tetris"

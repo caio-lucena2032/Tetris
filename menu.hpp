@@ -1,31 +1,43 @@
 #include <stdlib.h>
 #include <iostream>
 #include <time.h>
+#include "raylib.h"
 
-class menu
+class Menu
 {
+
+
 public:
-    menu();
+    Menu(Font font);
     void initializeNewPlayer();
-    void initializeNewTournament();
     void getPlayer();
     void showRules();
     void showBestPlayers();
+    void draw();
+
 
 private:
-    typedef struct player
+    struct player
     {
-        std::string name;
         int bestPontuaion;
-        int day;
-        int month;
-        int year;
         double time;
-        int pontuations[];
+        char* name;
     };
-    player players[2];
+    player *players;
+
+    int numOfPlayers;
+    int currentMenu;
+    Font font;
+
+    typedef enum
+    {
+        INITIAL_MENU = 0,
+        RULES_MENU = 1,
+        PLAYER_MENU = 2,
+        BEST_PLAYERS = 3,
+    } menuState;
 
     char* getName();
     void updateBestPlayers();
-
+    void drawInitialMenu();
 };
