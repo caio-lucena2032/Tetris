@@ -13,7 +13,7 @@ public:
     void getPlayer();
     void showRules();
     void showBestPlayers();
-    void draw();
+    bool draw();
 
 
 private:
@@ -37,7 +37,14 @@ private:
         BEST_PLAYERS = 3,
     } menuState;
 
-    char* getName();
+    char *getName();
     void updateBestPlayers();
     void drawInitialMenu();
+    void drawPlayerMenu();
+
+    bool wasNamePressed;
+    bool shouldPlay;
+    char name[16];
+    int nameLength;
+    double lastBarTime;
 };

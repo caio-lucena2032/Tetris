@@ -7,6 +7,14 @@ Menu::Menu(Font font)
     this->players = nullptr;
     this->numOfPlayers = 0;
     this->currentMenu = 0;
+    this->wasNamePressed = false;
+    
+    for (char item: this->name){
+        item = '\0';
+    }
+    this->nameLength = 0;
+    this->shouldPlay = false;
+    this->lastBarTime = 0;
 }
 
 void Menu::initializeNewPlayer()
@@ -22,27 +30,28 @@ void Menu::initializeNewPlayer()
         this->players = (player *)malloc(this->numOfPlayers * sizeof(player));
     }
 
-    this->players[this->numOfPlayers-1].name = this->getName();
+    // this->players[this->numOfPlayers-1].name = this->getName();
 }
 
 char *Menu::getName()
 {
-    char *name = nullptr;
+    char *name = (char *)malloc(sizeof(char) * 2);
     
     /*
         Lógica de desenhar botão na tela, imprimir e receber input do texto
     */
+    int keyPressed = GetKeyPressed();
+    sprintf(name, "%d", keyPressed);
 
     return name;
 }
 
-void Menu::draw()
+bool Menu::draw()
 {
     /*
         Fazer a lógica de mudança de Menus
     */
 
-    
     switch(this->currentMenu)
     {
         case menuState::INITIAL_MENU:
@@ -53,15 +62,19 @@ void Menu::draw()
             break;
 
         case menuState::PLAYER_MENU:
+            this->drawPlayerMenu();
             break;
 
         case menuState::BEST_PLAYERS:
             break;
     }
+    
+    return this->shouldPlay;
 }
 
 void Menu::drawInitialMenu()
 {
+    this->shouldPlay = false;
     char text[25] = "Welcome to Tetris!";
     int textSize = MeasureText(text, 38);
     DrawText(text, 250 - textSize/2, 100, 38, BLACK);
@@ -84,6 +97,8 @@ void Menu::drawInitialMenu()
     {
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
         {
+            strcpy(this->name, "         ");
+            this->nameLength = 0;
             this->currentMenu = menuState::PLAYER_MENU;
         }
     }
@@ -94,5 +109,83 @@ void Menu::drawInitialMenu()
         {
             this->currentMenu = menuState::BEST_PLAYERS;
         }
+    }
+}
+
+void Menu::drawPlayerMenu()
+{
+    char text[20] = "Insert your name: ";
+    Vector2 mousePoint = GetMousePosition();
+
+    int textSize = MeasureText(text, 34);
+    DrawText(text, 250 - textSize/2, 100, 34, BLACK);
+    
+    strcpy(text, "Min: 4 characteres");
+    textSize = MeasureText(text, 18);
+    DrawText(text, 250 - textSize/2, 145, 18, BLACK);
+
+    strcpy(text, "Max: 15 characteres");
+    textSize = MeasureText(text, 18);
+    DrawText(text, 250 - textSize/2, 160, 18, BLACK);
+    
+    Rectangle nameButton = {115, 200, 270, 85};
+    DrawRectangleRounded(nameButton, 0.3, 6, DARKBROWN);
+
+    if (CheckCollisionPointRec(mousePoint, nameButton) || this->wasNamePressed)
+    {
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) || this->wasNamePressed)
+        {            
+            this->wasNamePressed = true;
+            int keyPressed = GetCharPressed();
+
+            if (keyPressed >= 32 && keyPressed <= 125 && this->nameLength <= 15)
+            {
+                this->name[this->nameLength] = (char)keyPressed;
+                this->nameLength++;
+                this->name[this->nameLength] = '\0';
+            }
+
+            else if (IsKeyPressed(KEY_BACKSPACE))
+            {
+                if (this->nameLength >= 0)
+                {
+                    if (this->nameLength > 0)
+                        this->nameLength--;
+
+                    this->name[this->nameLength] = '\0';
+                }
+            }
+
+            else if (IsKeyPressed(KEY_ENTER) && this->nameLength >= 4)
+            {
+                this->wasNamePressed = false;
+                this->currentMenu = menuState::INITIAL_MENU;
+                this->shouldPlay = true;
+            }
+
+            strcpy(text, this->name);
+            textSize = MeasureText(text, 32);
+            DrawText(text, 115 + (270-textSize)/2, 230, 32, WHITE);
+        }
+        else
+        {
+            strcpy(text, "        ");
+            textSize = MeasureText(text, 32);
+            DrawText(text, 115 + (270-textSize)/2, 230, 32, WHITE);
+        }
+    }
+    
+    double currentTime = GetTime();
+    if (currentTime - this->lastBarTime > 1)
+    {
+        if (currentTime - this->lastBarTime > 1.75)
+            this->lastBarTime = currentTime;
+
+
+        if (this->nameLength > 0)
+            DrawText("|", 115 + textSize + (270-textSize)/2, 230, 32, WHITE);
+
+        else
+            DrawText("|", 250, 230, 32, WHITE);
     }
 }

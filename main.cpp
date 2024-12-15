@@ -91,17 +91,19 @@ int main()
             if (GetKeyPressed() == KEY_ENTER || isInMenu)
             {
                 isInMenu = true;
-                menu.draw();
                 
                 /*
                     Defines when should go back to play the game
                 */
-                // shouldReturnToGame = true;
+                shouldReturnToGame = menu.draw();
+                isInMenu = !shouldReturnToGame;
             }
             else
             {
                 drawGame(tetris, font);
                 tetris.draw();
+                
+
             }
         }
 
