@@ -33,16 +33,16 @@ Menu::Menu()
 //     this->players[this->numOfPlayers-1].name = this->getName();
 // }
 
-void Menu::updateBestPlayers(int pontuation, double time)
+void Menu::updateBestPlayers(int playerScore, double time)
 {
-    int playerPontuation = this->getPlayerPontuation(this->name);
+    int currentScore = this->getPlayerScore(this->name);
     
     /*
         In case the player is already in the archive
     */
-    if (playerPontuation > -1)
+    if (currentScore > -1)
     {
-        if (pontuation > playerPontuation)
+        if (playerScore > currentScore)
         {
             this->file.open(this->fileName, std::ios::in);
             std::vector<std::string> lines;
@@ -54,7 +54,7 @@ void Menu::updateBestPlayers(int pontuation, double time)
                 {
                     lines.push_back(line);
                     std::getline(this->file, line);
-                    line = std::to_string(pontuation);
+                    line = std::to_string(playerScore);
                     lines.push_back(line);
                 }
                 else
@@ -83,7 +83,7 @@ void Menu::updateBestPlayers(int pontuation, double time)
     {
         this->file.open(this->fileName, std::ios::app);
         this->file << this->name << std::endl;
-        this->file << pontuation << std::endl;
+        this->file << playerScore << std::endl;
         this->file << std::endl;
         this->file.close();
     }
@@ -272,7 +272,7 @@ void Menu::drawPlayerMenu()
     }
 }
 
-int Menu::getPlayerPontuation(std::string name)
+int Menu::getPlayerScore(std::string name)
 {
     this->file.open(this->fileName, std::ios::in);
     std::string line;

@@ -23,7 +23,6 @@ void Block::move(int rows, int columns)
 {
     this->rowOffset += rows;
     this->colOffset += columns;
-
 }
 
 void Block::rotate()
@@ -35,7 +34,7 @@ void Block::rotate()
     }
 }
 
-void Block::undoRotatio()
+void Block::UndoRotation()
 {
     this->rotationState--;
     if (this->rotationState < 0)

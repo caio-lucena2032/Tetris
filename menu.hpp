@@ -16,7 +16,7 @@ public:
     void initializeNewPlayer();
     void showRules();
     void showBestPlayers();
-    void updateBestPlayers(int bestPontuation, double time);
+    void updateBestPlayers(int bestScore, double time);
     bool draw();
 
 
@@ -39,7 +39,7 @@ private:
 
     void drawInitialMenu();
     void drawPlayerMenu(); 
-    int getPlayerPontuation(std::string name);
+    int getPlayerScore(std::string name);
 
     int numOfPlayers;
     int currentMenu;

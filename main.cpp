@@ -26,7 +26,7 @@ bool shoulLowerTheBlock(double interval)
 void drawGame(game tetris, Font font)
 {
     char scoreText[10];
-    sprintf(scoreText, "%d", tetris.playerPontuation);
+    sprintf(scoreText, "%d", tetris.playerScore);
     Vector2 textSize = MeasureTextEx(font, scoreText, 38, 2);
 
     DrawRectangleRounded({320, 55, 170, 85}, 0.3, 6, DARKBROWN);
@@ -68,6 +68,19 @@ int main()
         // Conditional to execute the game
         if ((!tetris.IsGameOver || shouldReturnToGame) && !isInMenu)
         {
+            
+            /*
+                Restart the game and variables to start a new game
+            */
+            if (shouldReturnToGame)
+            {
+                tetris.resetGame();
+                shouldReturnToGame = false;
+                isInMenu = false;
+                initializedTime = GetTime();
+                shouldUpdateBestPlayers = true;
+            }
+
             // Gets the start game time
             if (!initializedTime)
                 initializedTime = GetTime();
@@ -84,20 +97,10 @@ int main()
             /*
                 Scores of the game
             */
-            tetris.updatePontuation();
-            tetris.shouldIncreaseLevel();
+            tetris.updateScore();
 
             drawGame(tetris, font);
             tetris.draw();
-
-            if (shouldReturnToGame)
-            {
-                tetris.resetGame();
-                shouldReturnToGame = false;
-                isInMenu = false;
-                initializedTime = GetTime();
-                shouldUpdateBestPlayers = true;
-            }
         }
 
         // conditional to display the menu
@@ -106,21 +109,24 @@ int main()
             if (GetKeyPressed() == KEY_ENTER || isInMenu)
             {
                 isInMenu = true;
-                
-                /*
-                    Defines when should go back to play the game
-                */
                 shouldReturnToGame = menu.draw();
                 isInMenu = !shouldReturnToGame;
             }
+
+            /*
+                The game is over, but draw the game yet waiting for ENTER
+            */
             else
             {
                 drawGame(tetris, font);
                 tetris.draw();
-
+                
+                /*
+                    Update the best players once after the game end
+                */
                 if (shouldUpdateBestPlayers)
                 {
-                    menu.updateBestPlayers(tetris.playerPontuation, GetTime() - initializedTime);
+                    menu.updateBestPlayers(tetris.playerScore, GetTime() - initializedTime);
                     shouldUpdateBestPlayers = false;
                 }
                 

@@ -19,6 +19,7 @@ EXPLICAÇÃO DO CÓDIGO POR CLASSE:
 
     1. Game:
         Classe que faz a conexão entre a grade do jogo (grid), os blocos e o input dos jogadores
+        Apresentação do header e depois entra na lógica
 
     2. Grid:
         

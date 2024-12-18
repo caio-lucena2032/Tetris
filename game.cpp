@@ -9,11 +9,16 @@ game::game()
     this->currentBlock = getRandomBlock();
     this->nextBlock = getRandomBlock();
     this->IsGameOver = false;
-    this->playerPontuation = 0;
+    this->playerScore = 0;
     this->level = 1;
     this->gameSpeed = 0.5;
 
     srand(time(NULL));
+}
+
+std::vector<Block> game::getAllBlocks()
+{
+    return {IBlock(), JBlock(), LBlock(), OBlock(), SBlock(), TBlock(), ZBlock()};
 }
 
 Block game::getRandomBlock()
@@ -26,11 +31,6 @@ Block game::getRandomBlock()
     Block block = blocks[randomIndex];
     blocks.erase(blocks.begin() + randomIndex);
     return block;
-}
-
-std::vector<Block> game::getAllBlocks()
-{
-    return {IBlock(), JBlock(), LBlock(), OBlock(), SBlock(), TBlock(), ZBlock()};
 }
 
 void game::draw()
@@ -57,11 +57,6 @@ void game::draw()
 void game::handleInput()
 {
     int keyPressed = GetKeyPressed();
-
-    if (this->IsGameOver && keyPressed == KEY_ENTER)
-    {
-        this->resetGame();
-    }
 
     switch(keyPressed)
     {
@@ -146,7 +141,7 @@ void game::rotateBlock()
 
         if (this->isBlockOutside() || this->blockFits(this->currentBlock) == false)
         {
-            this->currentBlock.undoRotatio();
+            this->currentBlock.UndoRotation();
         }
     }
 }
@@ -162,6 +157,19 @@ bool game::isBlockOutside()
         }
     }
     return false;
+}
+bool game::blockFits(Block block)
+{
+    std::vector<position> tiles = block.getCellPosition();
+
+    for (position item: tiles)
+    {
+        if (grid.isCellEmpty(item.row, item.column) == false)
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
 void game::unableBlock()
@@ -180,24 +188,10 @@ void game::unableBlock()
     
     this->currentBlock = this->nextBlock;
     this->nextBlock = this->getRandomBlock();
-    this->playerPontuation +=50;
+    this->playerScore +=50;
 }
 
-bool game::blockFits(Block block)
-{
-    std::vector<position> tiles = block.getCellPosition();
-
-    for (position item: tiles)
-    {
-        if (grid.isCellEmpty(item.row, item.column) == false)
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
-void game::updatePontuation()
+void game::updateScore()
 {
     std::vector<int> rowsCompleted = grid.isRowCompleted();
     int differentTypes;
@@ -211,8 +205,43 @@ void game::updatePontuation()
             grid.moveRowsDown(item);
         }
 
-        this->playerPontuation += (300 * (std::size(rowsCompleted)) + 100) * this->level;
-        this->playerPontuation += 50 * differentTypes;
+        this->playerScore += (300 * (std::size(rowsCompleted)) + 100) * this->level;
+        this->playerScore += 50 * differentTypes;
+    }
+
+    this->shouldIncreaseLevel();
+}
+
+
+void game::shouldIncreaseLevel()
+{
+    int levelScore;
+
+    /*
+        Under level 5, the score starts in 10000 points 
+        and in each level it's increased 2500 points
+    */
+    if (this->level < 5)
+    {
+        levelScore = 2000 * this->level + 1000;
+    }
+    else if (this->level < 10)
+    {
+        levelScore = 4000 * this->level + 9000;
+    }
+    else if (this->level < 15)
+    {
+        levelScore = 5000 * this->level + 45000;
+    }
+    else
+    {
+        levelScore = 5000 * this->level + 163000;
+    }
+
+    if (this->playerScore >= levelScore)
+    {
+        this->level += 1;
+        this->gameSpeed -= 0.02;
     }
 }
 
@@ -222,39 +251,7 @@ void game::resetGame()
     this->blocks = this->getAllBlocks();
     this->currentBlock = this->getRandomBlock();
     this->nextBlock = this->getRandomBlock();
-    this->playerPontuation = 0;
+    this->playerScore = 0;
     this->level = 1;
     this->IsGameOver = false;
-}
-
-void game::shouldIncreaseLevel()
-{
-    int levelPontuation;
-
-    /*
-        Under level 5, the pontuation starts in 10000 points 
-        and in each level it's increased 2500 points
-    */
-    if (this->level < 5)
-    {
-        levelPontuation = 2000 * this->level + 1000;
-    }
-    else if (this->level < 10)
-    {
-        levelPontuation = 4000 * this->level + 9000;
-    }
-    else if (this->level < 15)
-    {
-        levelPontuation = 5000 * this->level + 45000;
-    }
-    else
-    {
-        levelPontuation = 5000 * this->level + 163000;
-    }
-
-    if (this->playerPontuation >= levelPontuation)
-    {
-        this->level += 1;
-        this->gameSpeed -= 0.02;
-    }
 }
