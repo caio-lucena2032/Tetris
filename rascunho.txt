@@ -14,3 +14,14 @@ pontuação total * número do nível
 ELEVAÇÃO DE LEVELS
 
 1000 * (level-1) + 1000;
+
+EXPLICAÇÃO DO CÓDIGO POR CLASSE:
+
+    1. Game:
+        Classe que faz a conexão entre a grade do jogo (grid), os blocos e o input dos jogadores
+
+    2. Grid:
+        
+3. Block + blocks
+4. Position
+5. Colors

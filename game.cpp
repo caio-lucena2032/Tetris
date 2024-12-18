@@ -12,6 +12,8 @@ game::game()
     this->playerPontuation = 0;
     this->level = 1;
     this->gameSpeed = 0.5;
+
+    srand(time(NULL));
 }
 
 Block game::getRandomBlock()
@@ -253,6 +255,6 @@ void game::shouldIncreaseLevel()
     if (this->playerPontuation >= levelPontuation)
     {
         this->level += 1;
-        this->gameSpeed -= 0.01;
+        this->gameSpeed -= 0.02;
     }
 }

@@ -1,9 +1,7 @@
 #include "menu.hpp"
-#include <string.h>
 
-Menu::Menu(Font font)
+Menu::Menu()
 {
-    this->font = font;
     this->players = nullptr;
     this->numOfPlayers = 0;
     this->currentMenu = 0;
@@ -15,36 +13,120 @@ Menu::Menu(Font font)
     this->nameLength = 0;
     this->shouldPlay = false;
     this->lastBarTime = 0;
+    this->numberOfPlayers = 0;
+    this->fileName = "Best_Players.txt";
 }
 
-void Menu::initializeNewPlayer()
+// void Menu::initializeNewPlayer()
+// {
+//     this->numOfPlayers++;
+
+//     if (numOfPlayers != 1)
+//     {
+//         this->players = (player *)realloc(this->players, this->numOfPlayers * sizeof(player));
+//     }
+//     else
+//     {
+//         this->players = (player *)malloc(this->numOfPlayers * sizeof(player));
+//     }
+
+//     this->players[this->numOfPlayers-1].name = this->getName();
+// }
+
+void Menu::updateBestPlayers(int pontuation, double time)
 {
-    this->numOfPlayers++;
-
-    if (numOfPlayers != 1)
-    {
-        this->players = (player *)realloc(this->players, this->numOfPlayers * sizeof(player));
-    }
-    else
-    {
-        this->players = (player *)malloc(this->numOfPlayers * sizeof(player));
-    }
-
-    // this->players[this->numOfPlayers-1].name = this->getName();
-}
-
-char *Menu::getName()
-{
-    char *name = (char *)malloc(sizeof(char) * 2);
+    int playerPontuation = this->getPlayerPontuation(this->name);
     
     /*
-        Lógica de desenhar botão na tela, imprimir e receber input do texto
+        In case the player is already in the archive
     */
-    int keyPressed = GetKeyPressed();
-    sprintf(name, "%d", keyPressed);
+    if (playerPontuation > -1)
+    {
+        if (pontuation > playerPontuation)
+        {
+            this->file.open(this->fileName, std::ios::in);
+            std::vector<std::string> lines;
+            std::string line;
 
-    return name;
+            while (std::getline(this->file, line))
+            {
+                if (line == this->name)
+                {
+                    lines.push_back(line);
+                    std::getline(this->file, line);
+                    line = std::to_string(pontuation);
+                    lines.push_back(line);
+                }
+                else
+                {
+                    lines.push_back(line);
+                }
+            }
+            this->file.close();
+            this->file.open(this->fileName, std::ios::out);
+
+            while (!lines.empty())
+            {
+                this->file << lines[0] << std::endl;
+                lines.erase(lines.begin());
+            }
+
+            this->file.close();   
+        }
+    
+    }
+    
+    /*
+        In case the player is not in the archive
+    */
+    else
+    {
+        this->file.open(this->fileName, std::ios::app);
+        this->file << this->name << std::endl;
+        this->file << pontuation << std::endl;
+        this->file << std::endl;
+        this->file.close();
+    }
+
+    this->file.open(this->fileName, std::ios::in);
+    std::map<std::string, std::string> map_players;
+    std::string name;
+    std::string score;
+    while (std::getline(this->file, name))
+    {
+        if(name != "\n" && !name.empty())
+        {
+            std::getline(this->file, score);
+            map_players[name] = score;
+        }
+    }
+    this->file.close();
+
+    this->file.open(this->fileName, std::ios::out);
+    while (!map_players.empty())
+    {
+        std::string hightestKey;
+        int heightestValue = 0;
+
+        for(auto& pair: map_players)
+        {
+            int playerScore = std::stoi(pair.second);
+            if (playerScore > heightestValue)
+            {
+                hightestKey = pair.first;
+                heightestValue = playerScore;
+            }
+        }
+        
+        this->file << hightestKey << std::endl;
+        this->file << heightestValue << std::endl;
+        this->file << std::endl;
+
+        map_players.erase(hightestKey);
+    }
+    this->file.close();
 }
+
 
 bool Menu::draw()
 {
@@ -97,7 +179,7 @@ void Menu::drawInitialMenu()
     {
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
         {
-            strcpy(this->name, "         ");
+            strcpy((char *)this->name, "         ");
             this->nameLength = 0;
             this->currentMenu = menuState::PLAYER_MENU;
         }
@@ -188,4 +270,22 @@ void Menu::drawPlayerMenu()
         else
             DrawText("|", 250, 230, 32, WHITE);
     }
+}
+
+int Menu::getPlayerPontuation(std::string name)
+{
+    this->file.open(this->fileName, std::ios::in);
+    std::string line;
+
+    while (std::getline(this->file, line))
+    {
+        if(line.compare(name) == 0)
+        {
+            std::getline(file, line);
+            this->file.close();
+            return std::stoi(line);
+        }
+    }
+    this->file.close();
+    return -1;
 }

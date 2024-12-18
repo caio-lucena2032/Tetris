@@ -4,6 +4,7 @@
 #include "blocks.cpp"
 
 #include <iostream>
+#include <time.h>
 
 class game
 {
@@ -20,6 +21,7 @@ public:
     void updatePontuation();
     void resetGame();
     void shouldIncreaseLevel();
+    
     Grid grid;
     int playerPontuation;
     int level;

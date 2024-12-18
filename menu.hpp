@@ -1,18 +1,22 @@
 #include <stdlib.h>
 #include <iostream>
-#include <time.h>
+#include <string>
+#include <string.h>
+#include <fstream>
+#include <stdio.h>
+#include <vector>
 #include "raylib.h"
+#include <map>
 
 class Menu
 {
 
-
 public:
-    Menu(Font font);
+    Menu();
     void initializeNewPlayer();
-    void getPlayer();
     void showRules();
     void showBestPlayers();
+    void updateBestPlayers(int bestPontuation, double time);
     bool draw();
 
 
@@ -21,13 +25,9 @@ private:
     {
         int bestPontuaion;
         double time;
-        char* name;
+        std::string name;
     };
     player *players;
-
-    int numOfPlayers;
-    int currentMenu;
-    Font font;
 
     typedef enum
     {
@@ -37,14 +37,19 @@ private:
         BEST_PLAYERS = 3,
     } menuState;
 
-    char *getName();
-    void updateBestPlayers();
     void drawInitialMenu();
-    void drawPlayerMenu();
+    void drawPlayerMenu(); 
+    int getPlayerPontuation(std::string name);
 
+    int numOfPlayers;
+    int currentMenu;
+    int nameLength;
+    int numberOfPlayers;
+    double lastBarTime;
     bool wasNamePressed;
     bool shouldPlay;
     char name[16];
-    int nameLength;
-    double lastBarTime;
+
+    std::string fileName;
+    std::fstream file;
 };

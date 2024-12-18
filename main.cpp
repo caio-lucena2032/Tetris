@@ -7,8 +7,10 @@
 #define FPS 60
 
 double lastTimeLoweredBlock = 0;
+double initializedTime = 0;
 bool shouldReturnToGame = false;
 bool isInMenu = true;
+bool shouldUpdateBestPlayers = true;
 
 bool shoulLowerTheBlock(double interval)
 {
@@ -43,12 +45,18 @@ void drawGame(game tetris, Font font)
 
 int main()
 {
+    /*
+        Initial configutarions and declarations
+    */
     InitWindow(WIDTH, HEIGHT, "TETRIS");
     SetTargetFPS(FPS);
     Font font = GetFontDefault();
     game tetris = game();
-    Menu menu = Menu(font);
-
+    Menu menu = Menu();
+    
+    /*
+        Main loop
+    */
     while(!WindowShouldClose())
     {
         /*
@@ -56,15 +64,13 @@ int main()
         */
         BeginDrawing();
         ClearBackground(GOLD);
-
+        
+        // Conditional to execute the game
         if ((!tetris.IsGameOver || shouldReturnToGame) && !isInMenu)
         {
-            /*
-                Scores of the game
-            */
-            tetris.updatePontuation();
-            tetris.shouldIncreaseLevel();
-
+            // Gets the start game time
+            if (!initializedTime)
+                initializedTime = GetTime();
 
             /*
                 Moviment of the player and the block
@@ -75,6 +81,12 @@ int main()
                 tetris.moveDown();
             }
             
+            /*
+                Scores of the game
+            */
+            tetris.updatePontuation();
+            tetris.shouldIncreaseLevel();
+
             drawGame(tetris, font);
             tetris.draw();
 
@@ -83,9 +95,12 @@ int main()
                 tetris.resetGame();
                 shouldReturnToGame = false;
                 isInMenu = false;
+                initializedTime = GetTime();
+                shouldUpdateBestPlayers = true;
             }
         }
-        
+
+        // conditional to display the menu
         else
         {
             if (GetKeyPressed() == KEY_ENTER || isInMenu)
@@ -102,8 +117,13 @@ int main()
             {
                 drawGame(tetris, font);
                 tetris.draw();
-                
 
+                if (shouldUpdateBestPlayers)
+                {
+                    menu.updateBestPlayers(tetris.playerPontuation, GetTime() - initializedTime);
+                    shouldUpdateBestPlayers = false;
+                }
+                
             }
         }
 
