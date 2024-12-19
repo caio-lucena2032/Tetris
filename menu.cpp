@@ -13,134 +13,79 @@ Menu::Menu()
     this->nameLength = 0;
     this->shouldPlay = false;
     this->lastBarTime = 0;
-    this->numberOfPlayers = 0;
     this->fileName = "Best_Players.txt";
+
+    if (this->file.is_open())
+        this->file.close(); 
+
+    this->getSavedPlayers();
 }
 
-// void Menu::initializeNewPlayer()
-// {
-//     this->numOfPlayers++;
+void Menu::initializeNewPlayer(std::string name, int score, double time)
+{
+    if (this->players == nullptr)
+    {
+        this->players = new player[1]; // Aloca espaço inicial
+    }
+    else
+    {
+        // Realoca manualmente os elementos existentes para um novo array maior
+        player* temp = new player[this->numOfPlayers + 1];
+        for (int i = 0; i < this->numOfPlayers; i++)
+        {
+            temp[i] = this->players[i];
+        }
+        delete[] this->players; // Libera a memória anterior
+        this->players = temp;
+    }
 
-//     if (numOfPlayers != 1)
-//     {
-//         this->players = (player *)realloc(this->players, this->numOfPlayers * sizeof(player));
-//     }
-//     else
-//     {
-//         this->players = (player *)malloc(this->numOfPlayers * sizeof(player));
-//     }
+    this->players[this->numOfPlayers].bestScore = score;
+    this->players[this->numOfPlayers].name = name;
+    this->players[this->numOfPlayers].time = time;
 
-//     this->players[this->numOfPlayers-1].name = this->getName();
-// }
+    this->numOfPlayers++;
+}
 
 void Menu::updateBestPlayers(int playerScore, double time)
 {
-    int currentScore = this->getPlayerScore(this->name);
+    /*
+        Verify if the player is already saved in the best players file
+        Returns the score if exist or -1, in case the player is not saved
+    */
+    player& playerStrange = this->getPlayerScore(this->name);
     
     /*
-        In case the player is already in the archive
+        In case the player is already saved in the file
     */
-    if (currentScore > -1)
+    if (playerStrange.bestScore > -1)
     {
-        if (playerScore > currentScore)
+        /*
+            Rewrite the file updating the best score, that was the current score recieved
+        */
+        if (playerScore > playerStrange.bestScore)
         {
-            this->file.open(this->fileName, std::ios::in);
-            std::vector<std::string> lines;
-            std::string line;
-
-            while (std::getline(this->file, line))
-            {
-                if (line == this->name)
-                {
-                    lines.push_back(line);
-                    std::getline(this->file, line);
-                    line = std::to_string(playerScore);
-                    lines.push_back(line);
-                }
-                else
-                {
-                    lines.push_back(line);
-                }
-            }
-            this->file.close();
-            this->file.open(this->fileName, std::ios::out);
-
-            while (!lines.empty())
-            {
-                this->file << lines[0] << std::endl;
-                lines.erase(lines.begin());
-            }
-
-            this->file.close();   
+            playerStrange.bestScore = playerScore;
         }
-    
     }
     
     /*
-        In case the player is not in the archive
+        In case the player is not in the archive, it appends its name and score in it
     */
     else
     {
-        this->file.open(this->fileName, std::ios::app);
-        this->file << this->name << std::endl;
-        this->file << playerScore << std::endl;
-        this->file << std::endl;
-        this->file.close();
+        this->initializeNewPlayer(this->name, playerScore, time);
     }
 
-    this->file.open(this->fileName, std::ios::in);
-    std::map<std::string, std::string> map_players;
-    std::string name;
-    std::string score;
-    while (std::getline(this->file, name))
-    {
-        if(name != "\n" && !name.empty())
-        {
-            std::getline(this->file, score);
-            map_players[name] = score;
-        }
-    }
-    this->file.close();
-
-    this->file.open(this->fileName, std::ios::out);
-    while (!map_players.empty())
-    {
-        std::string hightestKey;
-        int heightestValue = 0;
-
-        for(auto& pair: map_players)
-        {
-            int playerScore = std::stoi(pair.second);
-            if (playerScore > heightestValue)
-            {
-                hightestKey = pair.first;
-                heightestValue = playerScore;
-            }
-        }
-        
-        this->file << hightestKey << std::endl;
-        this->file << heightestValue << std::endl;
-        this->file << std::endl;
-
-        map_players.erase(hightestKey);
-    }
-    this->file.close();
+    this->sortPlayersByScore();
 }
 
 
 bool Menu::draw()
 {
-    /*
-        Fazer a lógica de mudança de Menus
-    */
-
     switch(this->currentMenu)
     {
         case menuState::INITIAL_MENU:
             this->drawInitialMenu();
-            break;
-
-        case menuState::RULES_MENU:
             break;
 
         case menuState::PLAYER_MENU:
@@ -272,20 +217,92 @@ void Menu::drawPlayerMenu()
     }
 }
 
-int Menu::getPlayerScore(std::string name)
+player& Menu::getPlayerScore(std::string name)
 {
+    for (int i = 0; i < this->numOfPlayers; i++)
+    {
+        if (this->players[i].name == name)
+            return this->players[i];
+    }
+    
+    std::string strange = "Stranger";
+    static player invalidPlayer{-1, 0, strange};
+    return invalidPlayer;
+}
+
+void Menu::sortPlayersByScore()
+{
+    /*
+        Search for the highest score and writes it with the respectlly name in the file
+    */
+    this->file.open(this->fileName, std::ios::out);
+
+    int choosedIndex[this->numOfPlayers];
+    std::fill_n(choosedIndex, this->numOfPlayers, -1);
+
+    for (int i = 0; i < this->numOfPlayers; i++)
+    {
+        player highest;
+        highest.bestScore = 0;
+        for (int j = 0; j < this->numOfPlayers; j++)
+        {
+            if (this->players[j].bestScore >= highest.bestScore && !this->isPlayerIndexInArray(j, i, choosedIndex))
+            {
+                if (this->players[j].bestScore == highest.bestScore)
+                {
+                    if (this->players[j].time < highest.time)
+                    {
+                        highest = this->players[j];
+                        choosedIndex[i] = j;                
+                    }
+                }
+                else
+                {
+                    highest = this->players[j];
+                    choosedIndex[i] = j;   
+                }
+            }
+        }
+
+        this->file << highest.name << std::endl;
+        this->file << highest.bestScore << std::endl;
+        this->file << highest.time << std::endl;
+        this->file << std::endl;
+    }
+    this->file.close();
+}
+
+bool Menu::isPlayerIndexInArray(int index, int tam, int arr[])
+{
+    for (int i = 0; i < tam; i++)
+    {
+        if (index == arr[i])
+            return true;
+    }
+    return false;
+}
+
+void Menu::getSavedPlayers()
+{
+
     this->file.open(this->fileName, std::ios::in);
     std::string line;
-
+    std::string name;
+    int score;
+    double time;
     while (std::getline(this->file, line))
     {
-        if(line.compare(name) == 0)
+        if (line != "\n" && !line.empty())
         {
-            std::getline(file, line);
-            this->file.close();
-            return std::stoi(line);
+            name = line;
+
+            std::getline(this->file, line);
+            score = std::stoi(line);
+            std::getline(this->file, line);
+            time = std::stod(line);
+
+            this->initializeNewPlayer(name, score, time);   
         }
     }
     this->file.close();
-    return -1;
 }

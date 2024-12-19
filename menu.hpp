@@ -8,44 +8,44 @@
 #include "raylib.h"
 #include <map>
 
+struct player
+{
+    int bestScore = -1;
+    double time = 0;
+    std::string name;
+};
+
 class Menu
 {
 
 public:
     Menu();
-    void initializeNewPlayer();
-    void showRules();
-    void showBestPlayers();
+    void initializeNewPlayer(std::string name, int score, double time);
     void updateBestPlayers(int bestScore, double time);
+    void showBestPlayers();
     bool draw();
 
-
 private:
-    struct player
-    {
-        int bestPontuaion;
-        double time;
-        std::string name;
-    };
-    player *players;
-
     typedef enum
     {
         INITIAL_MENU = 0,
-        RULES_MENU = 1,
-        PLAYER_MENU = 2,
-        BEST_PLAYERS = 3,
+        PLAYER_MENU = 1,
+        BEST_PLAYERS = 2,
     } menuState;
+
+    player *players;
 
     void drawInitialMenu();
     void drawPlayerMenu(); 
-    int getPlayerScore(std::string name);
+    void sortPlayersByScore();
+    void getSavedPlayers();
+    bool isPlayerIndexInArray(int index, int tam, int arr[]);
+    player& getPlayerScore(std::string name);
 
+    double lastBarTime;
     int numOfPlayers;
     int currentMenu;
     int nameLength;
-    int numberOfPlayers;
-    double lastBarTime;
     bool wasNamePressed;
     bool shouldPlay;
     char name[16];
