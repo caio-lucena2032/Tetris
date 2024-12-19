@@ -30,6 +30,7 @@ public:
     void moveDown();
     void moveAllDown();
     void rotateBlock();
+    void selectHoldBlock();
 
     /*
         Functions to update the score and level
@@ -46,6 +47,8 @@ public:
     int playerScore;
     int level;
     bool IsGameOver;
+    bool shouldHoldBlock;
+    bool holdBlockExists;
 
 private:
 
@@ -68,4 +71,6 @@ private:
     std::vector<Block> blocks;
     Block currentBlock;
     Block nextBlock;
+    Block holdBlock;
+    Block auxBlock;
 };

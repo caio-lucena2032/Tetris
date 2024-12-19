@@ -39,6 +39,11 @@ public:
     */
     std::vector<position> getCellPosition();
 
+    /*
+        Reset the block position
+    */
+    void resetBlock();
+
 
     std::map<int, std::vector<position>> cells;
     int id;

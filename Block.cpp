@@ -55,3 +55,10 @@ std::vector<position> Block::getCellPosition()
     }
     return movedTiles; 
 }
+
+void Block::resetBlock()
+{
+    this->rotationState = 0;
+    this->rowOffset = 0;
+    this->colOffset = 0;
+}

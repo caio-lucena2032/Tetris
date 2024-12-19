@@ -8,6 +8,8 @@ game::game()
     this->blocks = getAllBlocks();
     this->currentBlock = getRandomBlock();
     this->nextBlock = getRandomBlock();
+    this->shouldHoldBlock = true;
+    this->holdBlockExists = false;
     this->IsGameOver = false;
     this->playerScore = 0;
     this->level = 1;
@@ -41,17 +43,36 @@ void game::draw()
     switch (this->nextBlock.id)
     {
     case 3:
-        this->nextBlock.draw(255, 315);
+        this->nextBlock.draw(255, 225);
         break;
     
     case 4:
-        this->nextBlock.draw(255, 290);
+        this->nextBlock.draw(255, 210);
         break;
 
     default:
-        this->nextBlock.draw(270, 290);
+        this->nextBlock.draw(270, 210);
         break;
     }
+    
+    if (this->holdBlockExists)
+    {
+        switch (this->holdBlock.id)
+        {
+            case 3:
+                this->holdBlock.draw(345, 395);
+                break;
+
+            case 4:
+                this->holdBlock.draw(375, 410);
+                break;
+
+            default:
+                this->holdBlock.draw(360, 410);
+            break;
+        }
+    }
+   
 }
 
 void game::handleInput()
@@ -78,6 +99,10 @@ void game::handleInput()
 
         case KEY_SPACE:
             this->moveAllDown();
+            break;
+
+        case KEY_RIGHT_SHIFT:
+            this->selectHoldBlock();
             break;
     }
 }
@@ -146,6 +171,31 @@ void game::rotateBlock()
     }
 }
 
+void game::selectHoldBlock()
+{
+    if (this->shouldHoldBlock)
+    {
+        if (this->holdBlockExists)
+        {
+            this->auxBlock = this->holdBlock;
+            this->holdBlock = this->currentBlock;
+            this->currentBlock = this->auxBlock;
+        }
+        else
+        {
+            this->holdBlock = this->currentBlock;
+            this->currentBlock = this->nextBlock;
+            this->nextBlock = getRandomBlock();
+            this->holdBlockExists = true;
+        }
+
+        this->holdBlock.resetBlock();
+        this->currentBlock.resetBlock();
+
+        this->shouldHoldBlock = false;
+    }
+}
+
 bool game::isBlockOutside()
 {
     std::vector<position> tiles = currentBlock.getCellPosition();
@@ -188,6 +238,7 @@ void game::unableBlock()
     
     this->currentBlock = this->nextBlock;
     this->nextBlock = this->getRandomBlock();
+    this->shouldHoldBlock = true;
     this->playerScore +=50;
 }
 

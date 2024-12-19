@@ -29,17 +29,20 @@ void drawGame(game tetris, Font font)
     sprintf(scoreText, "%d", tetris.playerScore);
     Vector2 textSize = MeasureTextEx(font, scoreText, 38, 2);
 
-    DrawRectangleRounded({320, 55, 170, 85}, 0.3, 6, DARKBROWN);
     DrawTextEx(font, "Score", {355, 15}, 38, 2, WHITE);
-    DrawTextEx(font, scoreText, {320 + (170-textSize.x)/2, 80}, 38, 2, WHITE);
+    DrawRectangleRounded({320, 55, 170, 60}, 0.3, 6, DARKBROWN);
+    DrawTextEx(font, scoreText, {320 + (170-textSize.x)/2, 67.5}, 38, 2, WHITE);
 
-    DrawTextEx(font, "Next block", {320, 200}, 34, 2, WHITE);
-    DrawRectangleRounded({320, 240, 170, 170}, 0.3, 6, DARKBROWN);
+    DrawTextEx(font, "Next block", {320, 130}, 34, 2, WHITE);
+    DrawRectangleRounded({320, 170, 170, 140}, 0.3, 6, DARKBROWN);
+
+    DrawTextEx(font, "Hold block", {320, 330}, 34, 2, WHITE);
+    DrawRectangleRounded({320, 370, 170, 140}, 0.3, 6, DARKBROWN);
 
     if (tetris.IsGameOver)
     {
-        DrawTextEx(font, "Game over", {325, 500}, 34, 2, RED);
-        DrawTextEx(font, "Press ENTER to continue", {320, 535}, 12, 2, RED);
+        DrawTextEx(font, "Game over", {325, 520}, 34, 2, RED);
+        DrawTextEx(font, "Press ENTER to continue", {320, 555}, 12, 2, RED);
     }
 }
 
