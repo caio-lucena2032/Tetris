@@ -23,22 +23,30 @@ Menu::Menu()
 
 void Menu::initializeNewPlayer(std::string name, int score, double time)
 {
+    /*
+        First initialized player
+    */
     if (this->players == nullptr)
     {
-        this->players = new player[1]; // Aloca espaço inicial
+        this->players = new player[1];
     }
+
+    /*
+        Copy the origial players array and adds the new one memory
+        and replace the original array
+    */
     else
     {
-        // Realoca manualmente os elementos existentes para um novo array maior
         player* temp = new player[this->numOfPlayers + 1];
         for (int i = 0; i < this->numOfPlayers; i++)
         {
             temp[i] = this->players[i];
         }
-        delete[] this->players; // Libera a memória anterior
+        delete[] this->players;
         this->players = temp;
     }
-
+    
+    // initialize the variables
     this->players[this->numOfPlayers].bestScore = score;
     this->players[this->numOfPlayers].name = name;
     this->players[this->numOfPlayers].time = time;
@@ -62,9 +70,18 @@ void Menu::updateBestPlayers(int playerScore, double time)
         /*
             Rewrite the file updating the best score, that was the current score recieved
         */
-        if (playerScore > playerStrange.bestScore)
+        if (playerScore >= playerStrange.bestScore)
         {
-            playerStrange.bestScore = playerScore;
+            if(playerScore == playerStrange.bestScore && time < playerStrange.time)
+            {
+                playerStrange.bestScore = playerScore;
+                playerStrange.time = time;
+            }
+            else
+            {
+                playerStrange.bestScore = playerScore;
+                playerStrange.time = time;
+            }
         }
     }
     
@@ -79,6 +96,21 @@ void Menu::updateBestPlayers(int playerScore, double time)
     this->sortPlayersByScore();
 }
 
+void Menu::showBestPlayers()
+{
+    char text[30];
+    for (int i = 0; i < std::min(10, this->numOfPlayers); i++)
+    {
+        sprintf(text, "%d. %s ---> %d : %.2f", i+1, this->players[i].name.c_str(), this->players[i].bestScore, this->players[i].time);
+        DrawRectangleRounded({10, ((float)i*60)+20, 480, 40}, 0.3, 6, DARKBROWN);
+        DrawText(text, 20, ((float)i*60)+30, 20, WHITE);
+    }
+
+    if (IsKeyDown(KEY_ENTER))
+    {
+        this->currentMenu = menuState::INITIAL_MENU;
+    }
+}
 
 bool Menu::draw()
 {
@@ -93,6 +125,7 @@ bool Menu::draw()
             break;
 
         case menuState::BEST_PLAYERS:
+            this->showBestPlayers();
             break;
     }
     
@@ -233,40 +266,26 @@ player& Menu::getPlayerScore(std::string name)
 void Menu::sortPlayersByScore()
 {
     /*
-        Search for the highest score and writes it with the respectlly name in the file
+        Sorts the players by score
+    */
+    std::sort(this->players, this->players + this->numOfPlayers, [](const player& a, const player& b)
+    {
+        if (a.bestScore == b.bestScore)
+            return a.time < b.time; 
+
+        return a.bestScore > b.bestScore; 
+    });
+    
+    /*
+        Writes in the file
     */
     this->file.open(this->fileName, std::ios::out);
 
-    int choosedIndex[this->numOfPlayers];
-    std::fill_n(choosedIndex, this->numOfPlayers, -1);
-
     for (int i = 0; i < this->numOfPlayers; i++)
     {
-        player highest;
-        highest.bestScore = 0;
-        for (int j = 0; j < this->numOfPlayers; j++)
-        {
-            if (this->players[j].bestScore >= highest.bestScore && !this->isPlayerIndexInArray(j, i, choosedIndex))
-            {
-                if (this->players[j].bestScore == highest.bestScore)
-                {
-                    if (this->players[j].time < highest.time)
-                    {
-                        highest = this->players[j];
-                        choosedIndex[i] = j;                
-                    }
-                }
-                else
-                {
-                    highest = this->players[j];
-                    choosedIndex[i] = j;   
-                }
-            }
-        }
-
-        this->file << highest.name << std::endl;
-        this->file << highest.bestScore << std::endl;
-        this->file << highest.time << std::endl;
+        this->file << this->players[i].name << std::endl;
+        this->file << this->players[i].bestScore << std::endl;
+        this->file << this->players[i].time << std::endl;
         this->file << std::endl;
     }
     this->file.close();
