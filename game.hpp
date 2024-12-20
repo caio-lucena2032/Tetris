@@ -2,9 +2,7 @@
 #include "grid.hpp"
 #include "Block.hpp"
 #include "blocks.cpp"
-
 #include <iostream>
-#include <time.h>
 
 class game
 {

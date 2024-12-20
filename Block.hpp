@@ -1,6 +1,5 @@
 #pragma once
 #include <vector>
-#include <iostream>
 #include <map>
 #include "position.hpp"
 #include "colors.hpp"

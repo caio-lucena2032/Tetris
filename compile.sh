@@ -11,7 +11,7 @@ g++ -o $OUTPUT $SOURCE -lraylib -lm -ldl -lpthread -lGL -lrt -lX11
 
 # Verifica se a compilação foi bem-sucedida
 if [ $? -eq 0 ]; then
-    echo "Compilação bem-sucedida! Para executar, use ./$OUTPUT"
+    echo "Compilação deu certo"
 else
     echo "Erro na compilação!"
 fi

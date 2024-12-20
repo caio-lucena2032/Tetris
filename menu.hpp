@@ -1,13 +1,9 @@
-#include <stdlib.h>
-#include <iostream>
-#include <string>
-#include <string.h>
 #include <algorithm>
+#include <iostream>
 #include <fstream>
-#include <stdio.h>
-#include <vector>
+#include <string>
+#include <cstring>
 #include "raylib.h"
-#include <map>
 
 struct player
 {
