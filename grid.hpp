@@ -18,11 +18,6 @@ public:
     void initialize();
 
     /*
-        Prints the matrix in terminal
-    */
-    void print();
-
-    /*
         Draws the grid rectangle with margin and spaces between its cells
     */
     void draw();

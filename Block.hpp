@@ -14,7 +14,7 @@ public:
     Block();
 
     /*
-        Draws the block based in the offset and the tiles
+        Draws the block based in the offset and the blockMatrix
     */
     void draw(int offsetX, int offsetY);
 

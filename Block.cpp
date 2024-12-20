@@ -11,9 +11,9 @@ Block::Block()
 
 void Block::draw(int offsetX, int offsetY)
 {
-    std::vector<position> tiles = getCellPosition();
+    std::vector<position> blockMatrix = getCellPosition();
 
-    for(position item: tiles)
+    for(position item: blockMatrix)
     {
         DrawRectangle(item.column * cellSize+offsetX, item.row * cellSize+offsetY, cellSize-1, cellSize-1, colors[this->id]);
     }
@@ -45,15 +45,15 @@ void Block::UndoRotation()
 
 std::vector<position> Block::getCellPosition()
 {
-    std::vector<position> tiles = this->cells[this->rotationState];
-    std::vector<position> movedTiles;
+    std::vector<position> blockMatrix = this->cells[this->rotationState];
+    std::vector<position> movedblockMatrix;
 
-    for(position item: tiles)
+    for(position item: blockMatrix)
     {
         position newPos = position(item.row + this->rowOffset, item.column + this->colOffset);
-        movedTiles.push_back(newPos);
+        movedblockMatrix.push_back(newPos);
     }
-    return movedTiles; 
+    return movedblockMatrix; 
 }
 
 void Block::resetBlock()

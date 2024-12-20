@@ -21,18 +21,6 @@ void Grid::initialize()
     }
 }
 
-void Grid::print()
-{
-    for (int row = 0; row<this->numCols; row++)
-    {
-        for (int col = 0; col<this->numCols;col++)
-        {
-            std::cout << this->grid[row][col] << " ";
-        }
-        std::cout << std::endl;
-    }
-}
-
 void Grid::draw()
 {
     for (int row = 0; row<this->numRows; row++)

@@ -5,15 +5,15 @@ game::game()
 {
     this->grid = Grid();
 
-    this->blocks = getAllBlocks();
     this->currentBlock = getRandomBlock();
     this->nextBlock = getRandomBlock();
-    this->shouldHoldBlock = true;
+    this->blocks = getAllBlocks();
     this->holdBlockExists = false;
+    this->shouldHoldBlock = true;
     this->IsGameOver = false;
+    this->gameSpeed = 0.5;
     this->playerScore = 0;
     this->level = 1;
-    this->gameSpeed = 0.5;
 
     srand(time(NULL));
 }
@@ -198,8 +198,8 @@ void game::selectHoldBlock()
 
 bool game::isBlockOutside()
 {
-    std::vector<position> tiles = currentBlock.getCellPosition();
-    for (position item: tiles)
+    std::vector<position> blockMatrix = currentBlock.getCellPosition();
+    for (position item: blockMatrix)
     {
         if (grid.isCellOutside(item.row, item.column))
         {
@@ -210,9 +210,9 @@ bool game::isBlockOutside()
 }
 bool game::blockFits(Block block)
 {
-    std::vector<position> tiles = block.getCellPosition();
+    std::vector<position> blockMatrix = block.getCellPosition();
 
-    for (position item: tiles)
+    for (position item: blockMatrix)
     {
         if (grid.isCellEmpty(item.row, item.column) == false)
         {
@@ -224,9 +224,9 @@ bool game::blockFits(Block block)
 
 void game::unableBlock()
 {
-    std::vector<position> tiles = this->currentBlock.getCellPosition();
+    std::vector<position> blockMatrix = this->currentBlock.getCellPosition();
 
-    for (position item: tiles)
+    for (position item: blockMatrix)
     {
         grid.grid[item.row][item.column] = this->currentBlock.id;
     }
@@ -268,10 +268,6 @@ void game::shouldIncreaseLevel()
 {
     int levelScore;
 
-    /*
-        Under level 5, the score starts in 10000 points 
-        and in each level it's increased 2500 points
-    */
     if (this->level < 5)
     {
         levelScore = 2000 * this->level + 1000;

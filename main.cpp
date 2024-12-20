@@ -8,9 +8,9 @@
 
 double lastTimeLoweredBlock = 0;
 double initializedTime = 0;
+bool shouldUpdateBestPlayers = true;
 bool shouldReturnToGame = false;
 bool isInMenu = true;
-bool shouldUpdateBestPlayers = true;
 
 bool shoulLowerTheBlock(double interval)
 {
@@ -77,16 +77,12 @@ int main()
             */
             if (shouldReturnToGame)
             {
+                initializedTime = GetTime();
                 tetris.resetGame();
+                shouldUpdateBestPlayers = true;
                 shouldReturnToGame = false;
                 isInMenu = false;
-                initializedTime = GetTime();
-                shouldUpdateBestPlayers = true;
             }
-
-            // Gets the start game time
-            if (!initializedTime)
-                initializedTime = GetTime();
 
             /*
                 Moviment of the player and the block
